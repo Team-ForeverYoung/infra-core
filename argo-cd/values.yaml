@@ -2478,7 +2478,8 @@ repoServer:
     # -- Labels to be added to repo server pdb
     labels: {}
     # -- Annotations to be added to repo server pdb
-    annotations: {}
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::911167924085:role/ArgoCD-ECR-Access-Role"
     # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
     # @default -- `""` (defaults to 0 if not specified)
     minAvailable: ""
