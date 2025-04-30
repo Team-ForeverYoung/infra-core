@@ -30,7 +30,7 @@ openshift:
 ## Custom resource configuration
 crds:
   # -- Install and upgrade CRDs
-  install: false
+  install: true
   # -- Keep CRDs on chart uninstall
   keep: true
   # -- Annotations to be added to all CRDs
@@ -2126,7 +2126,8 @@ server:
   ## Server service configuration
   service:
     # -- Server service annotations
-    annotations: {}
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     # -- Server service labels
     labels: {}
     # -- Server service type
@@ -2147,7 +2148,7 @@ server:
     ## Ref: https://kubernetes.io/docs/concepts/services-networking/service/#application-protocol
     servicePortHttpsAppProtocol: ""
     # -- The class of the load balancer implementation
-    loadBalancerClass: ""
+    loadBalancerClass: null
     # -- LoadBalancer will get created with the IP specified in this field
     loadBalancerIP: ""
     # -- Source IP ranges to allow access to service from
