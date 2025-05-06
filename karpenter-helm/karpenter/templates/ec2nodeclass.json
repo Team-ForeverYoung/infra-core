@@ -1,0 +1,117 @@
+{
+    "apiVersion": "karpenter.k8s.aws/v1",
+    "kind": "EC2NodeClass",
+    "metadata": {
+        "annotations": {
+            "karpenter.k8s.aws/ec2nodeclass-hash": "15248264398425612938",
+            "karpenter.k8s.aws/ec2nodeclass-hash-version": "v4",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"karpenter.k8s.aws/v1\",\"kind\":\"EC2NodeClass\",\"metadata\":{\"annotations\":{},\"name\":\"default\"},\"spec\":{\"amiFamily\":\"AL2\",\"amiSelectorTerms\":[{\"id\":\"ami-02f85350e9e4b06c5\"}],\"role\":\"KarpenterNodeRole-foreveryoung-cluster\",\"securityGroupSelectorTerms\":[{\"tags\":{\"karpenter.sh/discovery\":\"foreveryoung-cluster\"}}],\"subnetSelectorTerms\":[{\"tags\":{\"karpenter.sh/discovery\":\"foreveryoung-cluster\"}}]}}\n"
+        },
+        "creationTimestamp": "2025-05-04T10:32:41Z",
+        "deletionGracePeriodSeconds": 0,
+        "deletionTimestamp": "2025-05-04T11:17:32Z",
+        "finalizers": [
+            "karpenter.k8s.aws/termination"
+        ],
+        "generation": 2,
+        "name": "default",
+        "resourceVersion": "4453218",
+        "uid": "359f4b3c-c393-4766-a074-b13c03ee23ac"
+    },
+    "spec": {
+        "amiFamily": "AL2",
+        "amiSelectorTerms": [
+            {
+                "id": "ami-02f85350e9e4b06c5"
+            }
+        ],
+        "metadataOptions": {
+            "httpEndpoint": "enabled",
+            "httpProtocolIPv6": "disabled",
+            "httpPutResponseHopLimit": 1,
+            "httpTokens": "required"
+        },
+        "role": "KarpenterNodeRole-foreveryoung-cluster",
+        "securityGroupSelectorTerms": [
+            {
+                "tags": {
+                    "karpenter.sh/discovery": "foreveryoung-cluster"
+                }
+            }
+        ],
+        "subnetSelectorTerms": [
+            {
+                "tags": {
+                    "karpenter.sh/discovery": "foreveryoung-cluster"
+                }
+            }
+        ]
+    },
+    "status": {
+        "amis": [
+            {
+                "id": "ami-02f85350e9e4b06c5",
+                "name": "amazon-eks-node-al2023-x86_64-standard-1.32-v20250419",
+                "requirements": [
+                    {
+                        "key": "kubernetes.io/arch",
+                        "operator": "In",
+                        "values": [
+                            "amd64"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "conditions": [
+            {
+                "lastTransitionTime": "2025-05-04T10:32:41Z",
+                "message": "object is awaiting reconciliation",
+                "observedGeneration": 1,
+                "reason": "AwaitingReconciliation",
+                "status": "Unknown",
+                "type": "InstanceProfileReady"
+            },
+            {
+                "lastTransitionTime": "2025-05-04T10:32:41Z",
+                "message": "",
+                "observedGeneration": 1,
+                "reason": "AMIsReady",
+                "status": "True",
+                "type": "AMIsReady"
+            },
+            {
+                "lastTransitionTime": "2025-05-04T10:32:41Z",
+                "message": "SubnetSelector did not match any Subnets",
+                "observedGeneration": 1,
+                "reason": "SubnetsNotFound",
+                "status": "False",
+                "type": "SubnetsReady"
+            },
+            {
+                "lastTransitionTime": "2025-05-04T10:32:42Z",
+                "message": "SecurityGroupSelector did not match any SecurityGroups",
+                "observedGeneration": 1,
+                "reason": "SecurityGroupsNotFound",
+                "status": "False",
+                "type": "SecurityGroupsReady"
+            },
+            {
+                "lastTransitionTime": "2025-05-04T10:32:42Z",
+                "message": "Awaiting AMI, Instance Profile, Security Group, and Subnet resolution",
+                "observedGeneration": 1,
+                "reason": "DependenciesNotReady",
+                "status": "False",
+                "type": "ValidationSucceeded"
+            },
+            {
+                "lastTransitionTime": "2025-05-04T10:32:41Z",
+                "message": "ValidationSucceeded=False, SecurityGroupsReady=False, SubnetsReady=False, InstanceProfileReady=Unknown",
+                "observedGeneration": 1,
+                "reason": "UnhealthyDependents",
+                "status": "False",
+                "type": "Ready"
+            }
+        ]
+    }
+}
