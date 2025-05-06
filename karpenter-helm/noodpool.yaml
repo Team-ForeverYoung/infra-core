@@ -1,0 +1,70 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: default
+  namespace: karpenter  # 네임스페이스 추가
+spec:
+  template:
+    spec:
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: kubernetes.io/os
+          operator: In
+          values: ["linux"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: ["t", "m"]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["2"]
+        - key: "karpenter.k8s.aws/instance-family"
+          operator: In
+          values: ["t3", "t3a","m5", "m5a"]
+        - key: "karpenter.k8s.aws/instance-cpu"
+          operator: In
+          values: ["2", "4", "8"]
+        - key: "karpenter.k8s.aws/instance-hypervisor"
+          operator: In
+          values: ["nitro"]
+
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: default
+      expireAfter: 720h # 30 * 24h = 720h
+  limits:
+    cpu: 100
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 1m
+---
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: default
+  namespace: karpenter  # 네임스페이스 추가
+spec:
+  amiFamily: AL2023
+  userData: |
+    #!/bin/bash
+    mkdir -p ~ec2-user/.ssh/
+    touch ~ec2-user/.ssh/authorized_keys
+    cat >> ~ec2-user/.ssh/authorized_keys <<EOF
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCoeW08eKe//vt6a5/U4swsl80+MLulIO2ua5o1jYc3gzH0TA1xnGrSkorMj/veQZ8J8xPrzAQyAZIqnxgKIp4vYhCR2rCG79k3MI0YGficxMqLz2fmnTTsVqYf1h2dSLtB3/YMwgIh2KKHP2pHCeXGTDmPUOjVvqFA3lDry3vNbBVLrG6gLcr9ZDcrGc1wTJ7Om/yU8vOKnGb1nNcvaz2e+Sk/CuicmeCKvv79hmH9A5LOk30x1ic6C/+1inAnvtN9oi8C4jdcsoV0eTkfpu+M1VJmoC8DAjzGwaDvSMQQ6IqReNUu6zOWdg0Sk+RgysuUA/xYbVQrBurx641UTst5
+    EOF
+    chmod 600 ~ec2-user/.ssh/authorized_keys
+    chown ec2-user:ec2-user ~ec2-user/.ssh/authorized_keys
+  role: KarpenterNodeRole-foreveryoung-cluster # replace with your cluster name
+  amiSelectorTerms:
+    - id: ami-0b3cbf3fb2a08fd49
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: foreveryoung-cluster
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: foreveryoung-cluster
