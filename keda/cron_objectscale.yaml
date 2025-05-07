@@ -1,0 +1,37 @@
+# apiVersion: keda.sh/v1alpha1
+# kind: ScaledObject
+# metadata:
+#   name: cron-scaler
+#   namespace: default #대상 deployment와 같은 네임스페이스에 두도록  
+# spec:
+#   scaleTargetRef:
+#     name: {{ .Release.Name }} # ScaledObject가 대상으로 하는 Deployment 이름
+#   pollingInterval: 30        # 상태 확인 주기 (초)
+#   cooldownPeriod: 300        # 스케일 후 안정화 대기 시간 (초)
+#   minReplicaCount: 1         # 최소 파드 수
+#   maxReplicaCount: 10        # 최대 파드 수
+#   triggers:
+#     - type: cron
+#       metadata:
+#         timezone: "Asia/Seoul"     # 시간대
+#         start: "30 * * * *"        # 시작 시각
+#         end: "59 * * * *"          # 종료 시각
+#         desiredReplicas: "9"      # 해당 시간 동안 유지할 파드 수
+
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cron-scaledobject
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: {{ .Release.Name }}
+  minReplicaCount: 3
+  cooldownPeriod: 600
+  triggers:
+  - type: cron
+    metadata:
+      timezone: "Asia/Seoul"
+      start: 24 * * * *
+      end: 59 * * * *
+      desiredReplicas: "20"
