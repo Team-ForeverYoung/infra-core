@@ -7,6 +7,11 @@ parameters:
   provisioningMode: efs-ap
   fileSystemId: {{.Values.forever.efsId}}
   directoryPerms: "700"
+  directoryPerms: "700" #여기부터
+  gidRangeStart: "1000"
+  gidRangeEnd: "2000"
+  basePath: "/jenkins" #동적프로비저닝 할거면 basePath만 써야해유 충돌함..
+  # accessPointId: fsap-0192df0b1cb170f6b # 여기까지는 Acces point만들때 넣었던정보들 근데 이거 같이 넣으면 안돼요
 volumeBindingMode: WaitForFirstConsumer
 reclaimPolicy: Delete
 ---
@@ -14,7 +19,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{.Values.persistence.existingClaim}}
-  namespace: devops-tools
+  namespace: jenkins
 spec:
   storageClassName: {{.Values.persistence.storageClass}}
   accessModes:
