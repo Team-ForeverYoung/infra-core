@@ -135,14 +135,25 @@ controller:
 
   # Overrides the init container default values
   # -- Resources allocation (Requests and Limits) for Init Container
-  initContainerResources: {}
-  # initContainerResources:
-  #   requests:
-  #     cpu: "50m"
-  #     memory: "256Mi"
-  #   limits:
-  #     cpu: "2000m"
-  #     memory: "4096Mi"
+  # initContainerResources: {}
+  initContainers:
+    - name: git-safe-directory
+      image: 'alpine/git'
+      command:
+        - sh
+        - -c
+        - |
+          git config --global --add safe.directory '*'
+    
+      volumeMounts:
+        - name: jenkins-efs-claim  
+          mountPath: /var/jenkins_home
+
+  volumes:
+    - name: jenkins-efs-claim  
+      persistentVolumeClaim:
+        claimName: jenkins-efs-claim #내가 정의한 efs pvc이름 적어줘야함
+
   # -- Environment variable sources for Init Container
   initContainerEnvFrom: []
 
@@ -241,7 +252,8 @@ controller:
   publishNotReadyAddresses:
 
   # -- Jenkins controller service annotations
-  serviceAnnotations: {}
+  serviceAnnotations: 
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
   # -- Jenkins controller custom labels for the StatefulSet
   statefulSetLabels: {}
   #   foo: bar
@@ -263,53 +275,35 @@ controller:
 
   probes:
     startupProbe:
-      # -- Set the failure threshold for the startup probe
-      failureThreshold: 12
+      failureThreshold: 30
       httpGet:
-        # -- Set the Pod's HTTP path for the startup probe
-        path: '{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
+        path: /login
+        #'{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
         # -- Set the Pod's HTTP port to use for the startup probe
         port: http
-      # -- Set the time interval between two startup probes executions in seconds
       periodSeconds: 10
-      # -- Set the timeout for the startup probe in seconds
       timeoutSeconds: 5
+      initialDelaySeconds: 30
 
     livenessProbe:
-      # -- Set the failure threshold for the liveness probe
-      failureThreshold: 5
-      httpGet:
-        # -- Set the Pod's HTTP path for the liveness probe
-        path: '{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
-        # -- Set the Pod's HTTP port to use for the liveness probe
-        port: http
-      # -- Set the time interval between two liveness probes executions in seconds
-      periodSeconds: 10
-      # -- Set the timeout for the liveness probe in seconds
-      timeoutSeconds: 5
-
-      # If Startup Probe is not supported on your Kubernetes cluster, you might want to use "initialDelaySeconds" instead.
-      # It delays the initial liveness probe while Jenkins is starting
-      # -- Set the initial delay for the liveness probe in seconds
-      initialDelaySeconds:
-
-    readinessProbe:
-      # -- Set the failure threshold for the readiness probe
       failureThreshold: 3
       httpGet:
-        # -- Set the Pod's HTTP path for the liveness probe
-        path: '{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
-        # -- Set the Pod's HTTP port to use for the readiness probe
+        path: /login
+        #'{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
         port: http
-      # -- Set the time interval between two readiness probes executions in seconds
       periodSeconds: 10
-      # -- Set the timeout for the readiness probe in seconds
       timeoutSeconds: 5
+      initialDelaySeconds: 30
 
-      # If Startup Probe is not supported on your Kubernetes cluster, you might want to use "initialDelaySeconds" instead.
-      # It delays the initial readiness probe while Jenkins is starting
-      # -- Set the initial delay for the readiness probe in seconds
-      initialDelaySeconds:
+    readinessProbe:
+      failureThreshold: 10
+      httpGet:
+        path: /login
+        #'{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
+        port: http
+      periodSeconds: 10
+      timeoutSeconds: 5
+      initialDelaySeconds: 30
 
   # PodDisruptionBudget config
   podDisruptionBudget:
