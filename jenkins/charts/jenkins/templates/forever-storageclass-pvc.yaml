@@ -1,0 +1,30 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: {{.Values.persistence.storageClass}}
+provisioner: efs.csi.aws.com  # AWS EFS CSI 드라이버 프로비저너
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: {{.Values.forever.efsId}}
+  directoryPerms: "700"
+  directoryPerms: "700" #여기부터
+  gidRangeStart: "1000"
+  gidRangeEnd: "2000"
+  basePath: "/jenkins" #동적프로비저닝 할거면 basePath만 써야해유 충돌함..
+  # accessPointId: fsap-0192df0b1cb170f6b # 여기까지는 Acces point만들때 넣었던정보들 근데 이거 같이 넣으면 안돼요
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{.Values.persistence.existingClaim}}
+  namespace: jenkins
+spec:
+  storageClassName: {{.Values.persistence.storageClass}}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{.Values.persistence.size}}  # EFS는 용량 제한이 없지만 Kubernetes 요구사항 상 필요
+
