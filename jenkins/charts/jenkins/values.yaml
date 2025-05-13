@@ -73,28 +73,12 @@ controller:
 
   hostNetworking: false
 
-  # When enabling LDAP or another non-Jenkins identity source, the built-in admin account will no longer exist.
-  # If you disable the non-Jenkins identity store and instead use the Jenkins internal one,
-  # you should revert controller.admin.username to your preferred admin user:
   admin:
-
-    # -- Admin username created as a secret if `controller.admin.createSecret` is true
     username: "admin"
-    # -- Admin password created as a secret if `controller.admin.createSecret` is true
-    # @default -- <random password>
     password:
-
-    # -- The key in the existing admin secret containing the username
     userKey: jenkins-admin-user
-    # -- The key in the existing admin secret containing the password
     passwordKey: jenkins-admin-password
-
-    # The default configuration uses this secret to configure an admin user
-    # If you don't need that user or use a different security realm, then you can disable it
-    # -- Create secret for admin user
     createSecret: true
-
-    # -- The name of an existing secret containing the admin credentials
     existingSecret: ""
   # -- Email address for the administrator of the Jenkins instance
   jenkinsAdminEmail:
@@ -136,23 +120,53 @@ controller:
   # Overrides the init container default values
   # -- Resources allocation (Requests and Limits) for Init Container
   # initContainerResources: {}
+  image:
+    registry: docker.io
+    repository: jenkins/jenkins
+    tag: lts
+
   initContainers:
-    - name: git-safe-directory
-      image: 'alpine/git'
+    - name: setup-tools
+      image: ubuntu:22.04
       command:
         - sh
         - -c
         - |
+          set -ex
+          apt-get update
+          apt-get install -y curl unzip lsb-release ca-certificates gnupg git
+          # Docker CLI 설치
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+          apt-get update
+          apt-get install -y docker-ce-cli
+          mkdir -p /var/jenkins_home/bin
+          cp /usr/bin/docker /var/jenkins_home/bin/
+          # AWS CLI 설치
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+          unzip /tmp/awscliv2.zip -d /tmp
+          /tmp/aws/install -i /var/jenkins_home/aws-cli -b /var/jenkins_home/bin
+          # git safe.directory 설정
           git config --global --add safe.directory '*'
-    
       volumeMounts:
-        - name: jenkins-efs-claim  
+        - name: jenkins-efs-claim
           mountPath: /var/jenkins_home
 
+  containerEnv:
+    - name: PATH
+      value: "/var/jenkins_home/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   volumes:
-    - name: jenkins-efs-claim  
+    - name: jenkins-efs-claim
       persistentVolumeClaim:
-        claimName: jenkins-efs-claim #내가 정의한 efs pvc이름 적어줘야함
+        claimName: jenkins-efs-claim
+
+  additionalVolumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+  additionalVolumes:
+    - name: docker-sock
+      hostPath:
+        path: /var/run/docker.sock
 
   # -- Environment variable sources for Init Container
   initContainerEnvFrom: []
@@ -473,7 +487,15 @@ controller:
   #    keyName: password
 
   # -- List of additional secrets to create and mount
-  additionalSecrets: []
+  additionalSecrets: {}
+
+  credentials:
+    secretText:
+      - id: "ecr-repo-uri"
+        description: "FOREVER backend BE ECR URI"
+        secretName: "jenkins-secret"   
+        secretKey: "ecr-uri" 
+
   # ref: https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/docs/features/secrets.adoc#kubernetes-secrets
   # additionalSecrets:
   #  - name: nameOfSecret
@@ -576,11 +598,8 @@ controller:
         #     cpu: 50m
         #     memory: 50Mi
       # -- Enables additional volume mounts for the config auto-reload container
-      additionalVolumeMounts: []
-        #   - name: auto-reload-config
-        #     mountPath: /var/config/logger
-        #   - name: auto-reload-logs
-        #     mountPath: /var/log/auto_reload
+
+
       # -- Config auto-reload logging settings
       logging:
         # See default settings https://github.com/kiwigrid/k8s-sidecar/blob/master/src/logger.py
@@ -1326,7 +1345,7 @@ serviceAccount:
   name: jenkins
   # -- Configures annotations for the ServiceAccount
   annotations: 
-      eks.amazonaws.com/role-arn=arn:aws:iam::911167924085:role/jenkins-efs-role
+      eks.amazonaws.com/role-arn: arn:aws:iam::911167924085:role/jenkins-combined-role
   # -- Configures extra labels for the ServiceAccount
   extraLabels: {}
   # -- Controller ServiceAccount image pull secret
@@ -1341,9 +1360,10 @@ serviceAccountAgent:
 
   # If not set and create is true, a name is generated using the fullname template
   # -- The name of the agent ServiceAccount to be used by access-controlled resources
-  name:
+  name: jenkins
   # -- Configures annotations for the agent ServiceAccount
-  annotations: {}
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::911167924085:role/jenkins-combined-role
   # -- Configures extra labels for the agent ServiceAccount
   extraLabels: {}
   # -- Agent ServiceAccount image pull secret
