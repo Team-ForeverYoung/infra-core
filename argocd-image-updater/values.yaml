@@ -169,8 +169,8 @@ authScripts:
   name: argocd-image-updater-authscripts
   scripts:
     ecr.sh: |
-        #!/bin/sh
-        aws ecr --region ap-northeast-2 get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -d
+      #!/bin/sh
+      echo "AWS:$(aws ecr --region ap-northeast-2 get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -d)"
 
 
 serviceAccount:
