@@ -170,6 +170,7 @@ authScripts:
   scripts:
     ecr.sh: |
       #!/bin/sh
+      export HOME=/tmp
       echo "AWS:$(aws ecr get-login-password --region ap-northeast-2)"
 
 
