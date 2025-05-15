@@ -4,7 +4,7 @@ metadata:
   name: forever-dev-fe
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: "911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_dev_fe_registry"
+    argocd-image-updater.argoproj.io/image-list: forever=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_dev_fe_registry
     argocd-image-updater.argoproj.io/forever.allow-tags: "^origin-develop-[0-9]+-[a-f0-9]+$"
     argocd-image-updater.argoproj.io/forever.update-strategy: name
     argocd-image-updater.argoproj.io/write-back-method: git
