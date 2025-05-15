@@ -1,0 +1,2 @@
+- helm install 때 -f 에 본인 환경에 맞는 values를 적용을 해주고 install을 해준다
+- 환경에 맞는 application.yaml을 apply를 해주도록 한다
