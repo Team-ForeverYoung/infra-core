@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: forever-prod-be
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: "forever=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_dev_registry"
+    argocd-image-updater.argoproj.io/forever.update-strategy: latest
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/git-branch: main
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Team-ForeverYoung/infra-app
+    path: bechart
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true
+
