@@ -170,7 +170,7 @@ authScripts:
   scripts:
     ecr.sh: |
       #!/bin/sh
-      echo "AWS:$(aws ecr --region ap-northeast-2 get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -d)"
+      echo "AWS:$(aws ecr get-login-password --region ap-northeast-2)"
 
 
 serviceAccount:
