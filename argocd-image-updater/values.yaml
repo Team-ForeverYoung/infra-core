@@ -176,7 +176,7 @@ authScripts:
 serviceAccount:
   create: true
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::911167924085:role/ArgoCD-ECR-Access-Role
+    eks.amazonaws.com/role-arn: arn:aws:iam::911167924085:role/Dev-ArgoCD-ECR-Access-Role
   labels: {}
   name: argocd-image-updater
 
