@@ -178,7 +178,7 @@ serviceAccount:
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::911167924085:role/ArgoCD-ECR-Access-Role
   labels: {}
-  name: ""
+  name: argocd-image-updater
 
 # -- Pod Annotations for the deployment
 podAnnotations: {}
