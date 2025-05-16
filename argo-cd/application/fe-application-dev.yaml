@@ -5,10 +5,11 @@ metadata:
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: forever=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_dev_fe_registry
-    argocd-image-updater.argoproj.io/forever.allow-tags: "^origin-develop-[0-9]+-[a-f0-9]+$"
-    argocd-image-updater.argoproj.io/forever.update-strategy: name
+    argocd-image-updater.argoproj.io/forever.allow-tags: "regexp:^origin-develop-[0-9]+-[a-f0-9]+$"
+    argocd-image-updater.argoproj.io/forever.update-strategy: alphabetical
     argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/git-branch: main
+
 spec:
   project: default
   source:
@@ -16,8 +17,8 @@ spec:
     path: fechart
     targetRevision: main
     helm:
-      # valueFiles:
-      #   - values-dev.yaml
+      valueFiles:
+        - .argocd-source-forever-dev-fe.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: default
