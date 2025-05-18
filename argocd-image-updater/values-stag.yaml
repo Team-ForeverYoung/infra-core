@@ -114,7 +114,7 @@ config:
   # Note: this is only relevant if config.applicationsAPIKind == 'argocd'
   argocd:
     grpcWeb: true
-    serverAddress: http://k8s-argocd-argocdse-592db1f7dd-a6d4f1c1382b4645.elb.ap-northeast-2.amazonaws.com/
+    serverAddress: http://k8s-argocd-argocdse-953c667ea4-32ff238df79d7d46.elb.ap-northeast-2.amazonaws.com/
     insecure: true
     plaintext: true
     token: ""
@@ -171,13 +171,19 @@ authScripts:
     ecr.sh: |
       #!/bin/sh
       export HOME=/tmp
-      echo "AWS:$(aws ecr get-login-password --region ap-northeast-2)"
+      export AWS_SHARED_CREDENTIALS_FILE=/tmp/.aws/credentials
+      export AWS_CONFIG_FILE=/tmp/.aws/config
+      
+      mkdir -p /tmp/.aws
+      
+      TOKEN=$(aws ecr get-login-password --region ap-northeast-2)
+      echo "AWS:$TOKEN"
 
 
 serviceAccount:
   create: true
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::911167924085:role/Dev-ArgoCD-ECR-Access-Role
+    eks.amazonaws.com/role-arn: arn:aws:iam::911167924085:role/Stag-ArgoCD-ECR-Access-Role
   labels: {}
   name: argocd-image-updater
 
