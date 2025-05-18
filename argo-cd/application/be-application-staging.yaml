@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: forever-dev-be
+  name: forever-stag-be
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: "forever=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_dev_registry"

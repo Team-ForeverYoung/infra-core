@@ -4,14 +4,11 @@ metadata:
   name: forever-stag-fe
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: image=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_stag_fe_registry
-    argocd-image-updater.argoproj.io/image.allow-tags: "regexp:^origin-staging-[0-9]+-[a-f0-9]+$"
-    argocd-image-updater.argoproj.io/image.update-strategy: alphabetical
+    argocd-image-updater.argoproj.io/image-list: forever=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_stag_fe_registry
+    argocd-image-updater.argoproj.io/forever.allow-tags: "regexp:^origin-staging-[0-9]+-[a-f0-9]+$"
+    argocd-image-updater.argoproj.io/forever.update-strategy: alphabetical
     argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/git-branch: main
-
-
-
 
 spec:
   project: default
@@ -19,8 +16,10 @@ spec:
     repoURL: https://github.com/Team-ForeverYoung/infra-app
     path: fechart
     targetRevision: main
+    # type: helm
     helm:
       valueFiles:
+        - .argocd-source-forever-stag-fe.yaml
         - values-stag.yaml
   destination:
     server: https://kubernetes.default.svc
