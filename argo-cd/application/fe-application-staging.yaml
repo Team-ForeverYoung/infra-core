@@ -4,11 +4,12 @@ metadata:
   name: forever-stag-fe
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: container.image=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_stag_fe_registry
-    argocd-image-updater.argoproj.io/container.image.allow-tags: "regexp:^origin-staging-[0-9]+-[a-f0-9]+$"
-    argocd-image-updater.argoproj.io/container.image.update-strategy: alphabetical
+    argocd-image-updater.argoproj.io/image-list: image=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_stag_fe_registry
+    argocd-image-updater.argoproj.io/image.allow-tags: "regexp:^origin-staging-[0-9]+-[a-f0-9]+$"
+    argocd-image-updater.argoproj.io/image.update-strategy: alphabetical
     argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/git-branch: main
+
 
 
 
@@ -21,7 +22,6 @@ spec:
     helm:
       valueFiles:
         - values-stag.yaml
-        # - .argocd-source-forever-staging-fe.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: default
