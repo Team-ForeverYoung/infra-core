@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: forever-staging-be
+  name: forever-dev-be
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: "forever=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_dev_registry"
@@ -14,6 +14,9 @@ spec:
     repoURL: https://github.com/Team-ForeverYoung/infra-app
     path: bechart
     targetRevision: main
+    helm:
+      valueFiles:
+        - values-dev.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: default
@@ -23,4 +26,3 @@ spec:
     automated:
       selfHeal: true
       prune: true
-
