@@ -19,6 +19,7 @@ spec:
     targetRevision: main
     helm:
       valueFiles:
+        - .argocd-source-forever-dev-be.yaml
         - values-dev.yaml
   destination:
     server: https://kubernetes.default.svc
