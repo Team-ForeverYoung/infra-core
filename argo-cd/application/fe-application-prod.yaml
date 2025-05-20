@@ -1,11 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: forever-dev-fe
+  name: forever-prod-fe
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: forever=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_dev_fe_registry
-    argocd-image-updater.argoproj.io/forever.allow-tags: "regexp:^origin-develop-[0-9]+-[a-f0-9]+$"
+    argocd-image-updater.argoproj.io/image-list: forever=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_prod_fe_registry
+    argocd-image-updater.argoproj.io/forever.allow-tags: "regexp:^origin-main-[0-9]+-[a-f0-9]+$"
     argocd-image-updater.argoproj.io/forever.update-strategy: alphabetical
     argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/git-branch: main
@@ -16,10 +16,11 @@ spec:
     repoURL: https://github.com/Team-ForeverYoung/infra-app
     path: fechart
     targetRevision: main
+    # type: helm
     helm:
       valueFiles:
-        - .argocd-source-forever-dev-fe.yaml
-        - values-dev.yaml
+        - .argocd-source-forever-prod-fe.yaml
+        - values-prod.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: default
