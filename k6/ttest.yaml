@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: all-user-once-each-all-pod
+data:
+  ttttest.js: |
+    import http from 'k6/http';
+
+    export const options = {
+      vus: 300,
+      iterations: 600, // 한 번만 실행하고, 안에서 for문으로 다 처리
+    };
+
+    const users = [1,2,3,4, 5, 6, 7, 8, 9, 10];
+
+    export default function () {
+      const url = 'http://k8s-default-reactapp-dc89345727-5a550320895082ce.elb.ap-northeast-2.amazonaws.com/api/v1/event';
+
+      for (const userId of users) {
+        const payload = JSON.stringify({
+          userId: userId,
+          eventId: 1,
+        });
+
+        const params = {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+
+        console.log(`Sending event for userId: ${userId}`);
+        http.post(url, payload, params);
+      }
+    }
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: my-k6-loadtestt
+spec:
+  parallelism: 1
+  script:
+    configMap:
+      name: all-user-once-each-all-pod
+      file: ttttest.js
+  arguments: ""
+apiVersion: k6.io/v1alpha1
