@@ -1,0 +1,12 @@
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: my-k6-loadtest
+spec:
+  parallelism: 1
+  script:
+    configMap:
+      name: user1-burst
+      file: ttest.js
+  arguments: ""
+apiVersion: k6.io/v1alpha1

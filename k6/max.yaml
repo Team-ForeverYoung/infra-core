@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-all-users-oncee
+data:
+  k6-script.js: |
+    import http from 'k6/http';
+
+    export const options = {
+      vus: 301,         // 301명 동시 접속
+      iterations: 601,  // 각 VU가 한 번씩만 실행
+    };
+
+    export default function () {
+      const userId = __VU; // 각 VU가 userId 1~301 담당
+      const url = 'http://k8s-default-reactapp-dc89345727-5a550320895082ce.elb.ap-northeast-2.amazonaws.com/api/v1/event';
+
+      const payload = JSON.stringify({
+        userId: userId,
+        eventId: 1,
+      });
+
+      const params = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+
+      console.log(`Sending event for userId: ${userId}`);
+      http.post(url, payload, params);
+    }
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: my-k6-loadtest
+spec:
+  parallelism: 1
+  script:
+    configMap:
+      name: k6-all-users-oncee
+      file: k6-script.js
+  arguments: ""
+apiVersion: k6.io/v1alpha1
