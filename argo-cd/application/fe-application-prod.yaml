@@ -6,7 +6,9 @@ metadata:
   annotations:
     argocd-image-updater.argoproj.io/image-list: forever=911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever_prod_fe_registry
     argocd-image-updater.argoproj.io/forever.allow-tags: "regexp:^origin-main-[0-9]+-[a-f0-9]+$"
-    argocd-image-updater.argoproj.io/forever.update-strategy: alphabetical
+    argocd-image-updater.argoproj.io/forever.update-strategy: latest
+    # argocd-image-updater.argoproj.io/forever.update-strategy: newest-build
+    # argocd-image-updater.argoproj.io/forever.update-strategy: alphabetical
     argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/git-branch: main
 
