@@ -1,0 +1,33 @@
+auth:
+  enabled: false
+
+broker:
+  persistence:
+    enabled: false
+  replicaCount: 3
+
+controller:
+  persistence:
+    enabled: false
+  replicaCount: 3
+
+externalAccess:
+  enabled: false
+
+livenessProbe:
+  enabled: false
+readinessProbe:
+  enabled: false
+
+metrics:
+  kafka:
+    enabled: false
+
+listeners:
+  ## @param listeners.client.name Name for the Kafka client listener
+  ## @param listeners.client.containerPort Port for the Kafka client listener
+  ## @param listeners.client.protocol Security protocol for the Kafka client listener. Allowed values are 'PLAINTEXT', 'SASL_PLAINTEXT', 'SASL_SSL' and 'SSL'
+  ## @param listeners.client.sslClientAuth Optional. If SASL_SSL is enabled, configure mTLS TLS authentication type. If SSL protocol is enabled, overrides tls.authType for this listener. Allowed values are 'none', 'requested' and 'required'
+  client:
+    containerPort: 9092
+    protocol: PLAINTEXT
