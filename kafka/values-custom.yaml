@@ -1,11 +1,30 @@
 auth:
   enabled: false
 
+controller:
+  replicaCount: 4
+  heapOpts: "-Xmx4096m -Xms4096m"
+  resources:
+    requests:
+      cpu: 2
+      memory: 4Gi
+    limits:
+      cpu: 4
+      memory: 8Gi
+
+
 broker:
   persistence:
     enabled: false
-  replicaCount: 3
-
+  replicaCount: 4
+  resources:
+    requests:
+      memory: 4Gi      # 최소 4Gi 이상으로 늘림
+      cpu: 2           # 필요시 CPU도 늘림
+    limits:
+      memory: 8Gi      # 최대 8Gi 이상으로 늘림
+      cpu: 4           # 필요시 CPU도 늘림
+  heapOpts: -Xmx4096m -Xms4096m  # JVM 힙도 늘림 (메모리의 50~70% 권장)
 controller:
   persistence:
     enabled: false

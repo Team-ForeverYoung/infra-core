@@ -681,7 +681,8 @@ controller:
   existingSecretConfig: ""
   ## @param controller.heapOpts Kafka Java Heap size for controller-eligible nodes
   ##
-  heapOpts: -Xmx1024m -Xms1024m
+  heapOpts: "-Xmx4096m -Xms1024m"
+
   ## @param controller.command Override Kafka container command
   ##
   command: []
@@ -1230,13 +1231,13 @@ broker:
   resourcesPreset: "small"
   ## @param broker.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
-  ## resources:
-  ##   requests:
-  ##     cpu: 2
-  ##     memory: 512Mi
-  ##   limits:
-  ##     cpu: 3
-  ##     memory: 1024Mi
+  resources:
+     requests:
+      #  cpu: 2
+       memory: 2Gi
+     limits:
+      #  cpu: 3
+       memory: 4Gi
   ##
   resources: {}
   ## Kafka pods' Security Context

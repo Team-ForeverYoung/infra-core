@@ -1,0 +1,40 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connect
+metadata:
+  name: mysql-connector
+  namespace: confluent
+spec:
+  replicas: 1
+  image:
+    application: 911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever-util:debezium-mysql-1.9.8iiii
+    init: confluentinc/cp-init-container-operator:6.1.6.0
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka.kafka.svc.cluster.local:9092
+  configOverrides:
+    server:
+      - group.id=my-connect-group
+      - offset.storage.topic=my-connect-offsets
+      - config.storage.topic=my-connect-configs
+      - status.storage.topic=my-connect-status
+      - plugin.classloader.share=true
+      - database.history.producer.bootstrap.servers=kafka.kafka.svc.cluster.local:9092
+      - database.history.consumer.bootstrap.servers=kafka.kafka.svc.cluster.local:9092
+  podTemplate:
+    resources:
+      requests:
+        cpu: 2000m
+        memory: 8Gi
+    probe:
+      liveness:
+        path: /
+        port: 8083
+        periodSeconds: 10
+        failureThreshold: 5
+        timeoutSeconds: 5
+      readiness:
+        path: /
+        port: 8083
+        periodSeconds: 10
+        failureThreshold: 5
+        timeoutSeconds: 5

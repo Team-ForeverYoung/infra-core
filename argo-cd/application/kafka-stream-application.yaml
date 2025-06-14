@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka-stream-server
+  namespace: argocd
+
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Team-ForeverYoung/infra-app
+    path: kafka-stream
+    targetRevision: main
+    helm:
+      valueFiles:
+        - values-custom.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kafka-stream
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true

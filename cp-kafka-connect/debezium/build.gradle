@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.debezium:debezium-scripting:3.1.2.Final'
+    implementation 'io.debezium:debezium-scripting-languages:3.1.2.Final'
+    implementation 'org.apache.groovy:groovy:4.0.21'
+    implementation 'org.apache.groovy:groovy-jsr223:4.0.21'
+    implementation 'org.apache.groovy:groovy-json:4.0.21'
+}
+
+shadowJar {
+    archiveBaseName.set('debezium-scripting-uber')
+    archiveClassifier.set('')
+    archiveVersion.set('3.1.2.Final')
+    mergeServiceFiles {
+        include 'META-INF/services/*'
+    }
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer)
+}

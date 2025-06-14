@@ -7,7 +7,7 @@ replicaCount: 1
 ## Image Info
 ## ref: https://hub.docker.com/r/confluentinc/cp-kafka/
 image: 911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever-util
-imageTag: debezium-mysql-1.9.8
+imageTag: debezium-mysql-1.9.8a
 
 
 ## Specify a imagePullPolicy
@@ -24,7 +24,7 @@ servicePort: 8083
 ## Kafka Connect properties
 ## ref: https://docs.confluent.io/current/connect/userguide.html#configuring-workers
 configurationOverrides:
-  "plugin.path": "/usr/share/java,/usr/share/confluent-hub-components"
+  "plugin.path": "/usr/share/java,/usr/share/confluent-hub-components,/usr/share/debezium-plugins"
   "key.converter": "io.confluent.connect.avro.AvroConverter"
   "value.converter": "io.confluent.connect.avro.AvroConverter"
   "key.converter.schemas.enable": "false"
