@@ -1,0 +1,54 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: aurora-connector
+  namespace: confluent
+spec:
+  class: io.debezium.connector.mysql.MySqlConnector
+  taskMax: 1
+  connectClusterRef:
+    name: mysql-connector
+  configs:
+    connector.class: io.debezium.connector.mysql.MySqlConnector
+    plugin.classloader.share: "true"
+
+    database.hostname: foreveryoung-kr-aurora.cluster-ctouy8o0uopm.ap-northeast-2.rds.amazonaws.com
+    database.port: "3306"
+    database.user: admin
+    database.password: forever1!
+    database.server.id: "984321"
+    database.include.list: forever_mysql_db
+
+    database.server.name: forever_mysql_db_aurora
+    schema.history.internal.kafka.topic: dbhistory.forever_mysql_db_aurora
+    topic.prefix: forever_mysql_db_aurora
+
+
+    # Debezium 2.x 이상 필수 설정
+    schema.history.internal: io.debezium.storage.kafka.history.KafkaSchemaHistory
+    schema.history.internal.kafka.bootstrap.servers: kafka.kafka.svc.cluster.local:9092
+
+    snapshot.locking.mode: none
+    database.allowPublicKeyRetrieval: "true"
+    table.include.list: forever_mysql_db.outbox_event
+
+    key.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: "false"
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter.schemas.enable: "false"
+
+    # 트랜스폼 설정
+    transforms: filter,extractAfter,extractKey
+
+    # insert 이벤트만 필터링
+    transforms.filter.type: io.debezium.transforms.Filter
+    transforms.filter.language: jsr223.groovy
+    transforms.filter.condition: "value.schema().field('op') != null && value.get('op') == 'c'"
+
+    # after 필드만 추출 (outbox row 전체)
+    transforms.extractAfter.type: org.apache.kafka.connect.transforms.ExtractField$Value
+    transforms.extractAfter.field: after
+
+    # key에 id만 남기기 (필요시 message_key 등으로 변경 가능)
+    transforms.extractKey.type: org.apache.kafka.connect.transforms.ExtractField$Key
+    transforms.extractKey.field: id
