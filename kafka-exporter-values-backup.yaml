@@ -1,0 +1,22 @@
+extraArgs:
+- --kafka.server=kafka.kafka.svc.cluster.local:9092
+image:
+  pullPolicy: IfNotPresent
+  repository: danielqsj/kafka-exporter
+  tag: v1.9.0
+replicaCount: 1
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+service:
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: "9308"
+    prometheus.io/scrape: "true"
+  port: 9308
+  portName: http
+  type: ClusterIP
