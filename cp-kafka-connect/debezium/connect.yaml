@@ -5,9 +5,12 @@ metadata:
   namespace: confluent
 spec:
   replicas: 1
+  # image:
+  #   application: 911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever-util:debezium-mysql-1.9.8iiii
+  #   init: confluentinc/cp-init-container-operator:6.1.6.0
   image:
     application: 911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/forever-util:debezium-mysql-1.9.8iiii
-    init: confluentinc/cp-init-container-operator:6.1.6.0
+    init: 911167924085.dkr.ecr.ap-northeast-2.amazonaws.com/temp:cp-init-container-operator-6.1.6.0
   dependencies:
     kafka:
       bootstrapEndpoint: kafka.kafka.svc.cluster.local:9092

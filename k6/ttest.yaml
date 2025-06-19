@@ -5,33 +5,48 @@ metadata:
 data:
   ttttest.js: |
     import http from 'k6/http';
+    import { check, sleep } from 'k6';
 
-    export const options = {
-      vus: 300,
-      iterations: 600, // 한 번만 실행하고, 안에서 for문으로 다 처리
+    export let options = {
+        stages: [
+            { duration: '30s', target: 100 },   // 워밍업 단계
+            { duration: '1m', target: 500 },    // 일반 부하
+            { duration: '1m', target: 1414 },   // 최대 부하
+            { duration: '30s', target: 0 },     // 정리 단계
+        ],
     };
 
-    const users = [1,2,3,4, 5, 6, 7, 8, 9, 10];
+    const BASE_URL = 'http://k8s-default-reactapp-3f5f457b0a-d073cc7261516ca8.elb.ap-northeast-2.amazonaws.com';
 
     export default function () {
-      const url = 'http://k8s-default-reactapp-dc89345727-5a550320895082ce.elb.ap-northeast-2.amazonaws.com/api/v1/event';
+        const userId = Math.floor(Math.random() * 1414 + 1).toString();
 
-      for (const userId of users) {
-        const payload = JSON.stringify({
-          userId: userId,
-          eventId: 1,
-        });
+        for (let i = 0; i < 5; i++) {
+            const price = Math.floor(Math.random() * 1000) + 1;
 
-        const params = {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        };
+            // POST: 포인트 적립
+            const postRes = http.post(`${BASE_URL}/api/v1/point`, JSON.stringify({
+                price: price,
+                userId: userId,
+            }), {
+                headers: { 'Content-Type': 'application/json' },
+            });
 
-        console.log(`Sending event for userId: ${userId}`);
-        http.post(url, payload, params);
-      }
+            check(postRes, {
+                'POST status is 200': (r) => r.status === 200,
+            });
+
+            // GET: 포인트 확인
+            const getRes = http.get(`${BASE_URL}/api/v1/point/${userId}`);
+
+            check(getRes, {
+                'GET status is 200': (r) => r.status === 200,
+            });
+
+            sleep(0.1); // 너무 빠른 폭격 방지
+        }
     }
+
 ---
 apiVersion: k6.io/v1alpha1
 kind: TestRun

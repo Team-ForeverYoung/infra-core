@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: single-run-500a
+data:
+  single-run-500a.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+
+    export let options = {
+        vus: 500, 
+        iterations: 500, 
+    };
+
+    const BASE_URL = 'http://k8s-default-reactapp-b81ff3f555-ead17ee6d6f665fb.elb.ap-northeast-2.amazonaws.com';
+
+    export default function () {
+        const userId = __VU.toString(); // 1 ~ 10000
+
+        const price = Math.floor(Math.random() * 1000) + 1;
+
+        const postRes = http.post(`${BASE_URL}/api/v1/point`, JSON.stringify({
+            price: price,
+            userId: userId,
+        }), {
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        check(postRes, {
+            'POST status is 200': (r) => r.status === 200,
+        });
+
+        sleep(0.1); // 부하 완화용
+    }
+
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: loadtest-single-run-500a
+spec:
+  parallelism: 1
+  script:
+    configMap:
+      name: single-run-500a
+      file: single-run-500a.js

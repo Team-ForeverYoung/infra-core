@@ -442,3 +442,7 @@ manager:
   # @schema
   # manager.podSecurityContext -- A security context defines privileges and access control settings for a pod.
   podSecurityContext: {}
+
+controller:
+  config:
+    testRunTTLSeconds: 3600

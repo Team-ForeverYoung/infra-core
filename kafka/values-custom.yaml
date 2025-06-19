@@ -11,6 +11,11 @@ controller:
     limits:
       cpu: 4
       memory: 8Gi
+image:
+  registry: 911167924085.dkr.ecr.ap-northeast-2.amazonaws.com
+  repository: temp2
+  tag: 4.0.0-debian-12-r5
+  pullPolicy: IfNotPresent
 
 
 broker:

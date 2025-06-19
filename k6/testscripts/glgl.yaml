@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: single-run-10000baacaa1
+data:
+  single-run-10000baacaa1.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+
+    export let options = {
+        stages: [
+            { duration: '1m', target: 1000 },   // 1분 동안 1,000명 도달
+            { duration: '1m', target: 3000 },   // 그 후 1분 동안 3,000명 도달
+            { duration: '1m', target: 6000 },   // 그 후 1분 동안 6,000명 도달
+            { duration: '1m', target: 10000 },  // 그 후 1분 동안 10,000명 도달
+            { duration: '30s', target: 0 },     // 점차 종료
+        ],
+    };
+
+    const BASE_URL = 'http://k8s-default-reactapp-b81ff3f555-ead17ee6d6f665fb.elb.ap-northeast-2.amazonaws.com';
+
+    export default function () {
+        const userId = __VU.toString(); // 각 가상 유저마다 고유한 userId 사용
+
+        const price = Math.floor(Math.random() * 1000) + 1;
+
+        const postRes = http.post(`${BASE_URL}/api/v1/point`, JSON.stringify({
+            price: price,
+            userId: userId,
+        }), {
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        check(postRes, {
+            'POST status is 200': (r) => r.status === 200,
+        });
+
+        sleep(0.1); // 부하 완화용
+    }
+
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: loadtest-single-run-10000baacaa1
+spec:
+  parallelism: 1
+  script:
+    configMap:
+      name: single-run-10000baacaa1
+      file: single-run-10000baacaa1.js
+  arguments: ""
+

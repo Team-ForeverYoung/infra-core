@@ -1,5 +1,8 @@
 extraArgs:
   - --kafka.server=kafka.kafka.svc.cluster.local:9092
+  - --kafka.server=kafka.kafka.svc.cluster.local:9092
+  - --topic.filter=.*
+  - --group.filter=.*
 
 image:
   repository: danielqsj/kafka-exporter

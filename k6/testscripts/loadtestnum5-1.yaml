@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: single-run-10000
+data:
+  single-run-10000a.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+
+    export let options = {
+        vus: 10000,
+        iterations: 10000,
+    };
+
+    const BASE_URL = 'http://k8s-default-reactapp-b81ff3f555-ead17ee6d6f665fb.elb.ap-northeast-2.amazonaws.com';
+
+    export default function () {
+        const userId = __VU.toString();
+        const price = Math.floor(Math.random() * 1000) + 1;
+
+        const postRes = http.post(`${BASE_URL}/api/v1/point`, JSON.stringify({
+            price: price,
+            userId: userId,
+        }), {
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        check(postRes, {
+            'POST status is 200': (r) => r.status === 200,
+        });
+
+        sleep(0.1);
+    }
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: manual-k6-loadtest
+spec:
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      containers:
+        - name: k6
+          image: grafana/k6
+          args: ["run", "/scripts/single-run-10000a.js"]
+          volumeMounts:
+            - name: script-volume
+              mountPath: /scripts
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1024Mi"
+      restartPolicy: Never
+      volumes:
+        - name: script-volume
+          configMap:
+            name: single-run-10000
+
